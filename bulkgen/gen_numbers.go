@@ -29,6 +29,7 @@ func ProcessGen(mainCode int, areaCodes []int, totalGen int, file *os.File) (int
 				generatedNumbers[genNum] = true
 			}
 			color.New(color.FgHiBlue).Printf("\rGenerating... %d/%d", i, totalGen)
+			time.Sleep(time.Microsecond)
 		}
 	}
 	endTime := time.Now()

@@ -22,7 +22,6 @@ func main() {
 				 [x] Created By @hidden404_bot [x]
 				 
 				 
-
 	`
 	menu.SlowPrintArt(art, time.Millisecond*50)
 	menuOptions := `
@@ -30,6 +29,8 @@ func main() {
 
 
 		3. Bulk SMS Sender			4. Exit
+
+		
 	`
 	menu.SlowPrintMenu(menuOptions, time.Millisecond*50)
 	var choiceStr string

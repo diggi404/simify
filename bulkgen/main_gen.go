@@ -7,6 +7,8 @@ import (
 	"simify/fileutil"
 	"strconv"
 	"time"
+
+	"github.com/fatih/color"
 )
 
 func GenNumbers() {
@@ -63,9 +65,18 @@ func GenNumbers() {
 		fmt.Printf("err: %v\n", err)
 		return
 	}
-
+	fmt.Print("\033[A\033[K")
+	fmt.Print("\033[A\033[K")
+	fmt.Print("\033[A\033[K")
+	fmt.Print("\033[A\033[K")
+	fmt.Print("\033[A\033[K")
+	fmt.Print("\033[A\033[K")
+	fmt.Print("\033[A\033[K")
+	fmt.Print("\033[A\033[K")
 	filteredNums, elapsedTime := ProcessGen(mainCode, parsedCodes, totalGen, file)
 	fmt.Println()
-	fmt.Printf("\U0001F604 %d numbers generated after removing duplicates. The process took %0.2f\n", filteredNums, float32(elapsedTime.Seconds()))
+	fmt.Println()
+	color.New(color.FgGreen).Printf("%d numbers generated after removing duplicates.\n", filteredNums)
+	color.New(color.FgGreen).Printf("This process took %0.2f seconds.\n", float32(elapsedTime.Seconds()))
 
 }
