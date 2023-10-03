@@ -121,17 +121,19 @@ func SingleAPILookup() {
 	}
 	numberChunks := make(chan []string, chunkSize)
 	proxyChannel := make(chan proxy.Dialer, 1)
+	uncheckOutPutChan := make(chan bool)
 	var wg sync.WaitGroup
 	var mutex sync.Mutex
 	carriers := make(map[string]*os.File)
 	uncheckedNumFile := make(map[string]*os.File)
 	var totalChecks int
+	var chanClosed bool
 
 	proxies := ProxyParser(proxyList, proxyType)
 
 	for i := 0; i < maxWorkers; i++ {
 		wg.Add(1)
-		go ProcessLookup(numberChunks, &wg, &mutex, proxyChannel, apiKey, &carriers, &uncheckedNumFile, &totalChecks)
+		go ProcessLookup(numberChunks, &wg, &mutex, proxyChannel, apiKey, &carriers, &uncheckedNumFile, &totalChecks, uncheckOutPutChan, &chanClosed)
 	}
 
 	for i := 0; i < len(numberList); i += chunkSize {
@@ -147,6 +149,17 @@ func SingleAPILookup() {
 		for {
 			for _, proxy := range proxies {
 				proxyChannel <- proxy
+			}
+		}
+	}()
+
+	go func() {
+		run := true
+		for run {
+			_, ok := <-uncheckOutPutChan
+			if !ok {
+				color.New(color.FgHiRed).Printf("\nYou have exhausted your account balance!\nUpdating unchecked_numbers file. Please wait...\n")
+				run = false
 			}
 		}
 	}()

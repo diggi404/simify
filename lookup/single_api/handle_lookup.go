@@ -10,11 +10,11 @@ import (
 	"golang.org/x/net/proxy"
 )
 
-func ProcessLookup(numberChunks <-chan []string, wg *sync.WaitGroup, mutex *sync.Mutex, proxyChannel <-chan proxy.Dialer, apiKey string, carriers *map[string]*os.File, uncheckedNumFile *map[string]*os.File, totalChecks *int) {
+func ProcessLookup(numberChunks <-chan []string, wg *sync.WaitGroup, mutex *sync.Mutex, proxyChannel <-chan proxy.Dialer, apiKey string, carriers *map[string]*os.File, uncheckedNumFile *map[string]*os.File, totalChecks *int, uncheckOutPutChan chan bool, chanClosed *bool) {
 	defer wg.Done()
 	numbers := <-numberChunks
 
-	for _, number := range numbers {
+	for main_index, number := range numbers {
 		for proxy := range proxyChannel {
 			result, statusCode, err := LookupAPI(proxy, number, apiKey)
 			if err == nil {
@@ -40,16 +40,26 @@ func ProcessLookup(numberChunks <-chan []string, wg *sync.WaitGroup, mutex *sync
 				break
 			} else if statusCode == 403 {
 				mutex.Lock()
+				if !*chanClosed {
+					close(uncheckOutPutChan)
+					*chanClosed = true
+				}
 				if _, exists := (*uncheckedNumFile)["unchecked"]; !exists {
 					file, _ := fileutil.WriteToFile("HRL_Lookup/unchecked_numbers", "unchecked_numbers.txt")
 					(*uncheckedNumFile)["unchecked"] = file
-					file.WriteString(number + "\n")
+					for i := main_index; i < len(numbers); i++ {
+						num := numbers[i]
+						file.WriteString(num + "\n")
+					}
 				} else {
 					file := (*uncheckedNumFile)["unchecked"]
-					file.WriteString(number + "\n")
+					for i := main_index; i < len(numbers); i++ {
+						num := numbers[i]
+						file.WriteString(num + "\n")
+					}
 				}
 				mutex.Unlock()
-				break
+				return
 			}
 		}
 	}

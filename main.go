@@ -23,7 +23,7 @@ func main() {
 				 
 				 
 	`
-	menu.SlowPrintArt(art, time.Millisecond*50)
+	menu.SlowPrintArt(art, time.Millisecond*30)
 	menuOptions := `
 		1. Bulk Number Generator				2. HRL Lookup Using Single Telnyx API
 
@@ -35,7 +35,7 @@ func main() {
 
 		
 	`
-	menu.SlowPrintMenu(menuOptions, time.Millisecond*50)
+	menu.SlowPrintMenu(menuOptions, time.Millisecond*30)
 	var choiceStr string
 	fmt.Print("Enter your option :> ")
 	fmt.Scanln(&choiceStr)
