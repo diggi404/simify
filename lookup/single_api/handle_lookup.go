@@ -26,7 +26,7 @@ func ProcessLookup(numberChunks <-chan []string, wg *sync.WaitGroup, mutex *sync
 				location := fmt.Sprintf("%s, %s", city, state)
 				*totalChecks++
 				color.New(color.FgBlue).Printf("%d -> ", *totalChecks)
-				outputStr := fmt.Sprintf("%s | %s | %s", number, lineType, location)
+				outputStr := fmt.Sprintf("%s | %s | %s | %s", number, lineType, carrier, location)
 				color.New(color.FgHiGreen).Printf("%s\n", outputStr)
 				if _, exists := (*carriers)[carrier]; !exists {
 					file, _ := fileutil.WriteToFile("HRL_Lookup/verified_numbers", carrier+".txt")
