@@ -125,12 +125,13 @@ func SingleAPILookup() {
 	var mutex sync.Mutex
 	carriers := make(map[string]*os.File)
 	uncheckedNumFile := make(map[string]*os.File)
+	var totalChecks int
 
 	proxies := ProxyParser(proxyList, proxyType)
 
 	for i := 0; i < maxWorkers; i++ {
 		wg.Add(1)
-		go ProcessLookup(numberChunks, &wg, &mutex, proxyChannel, apiKey, &carriers, &uncheckedNumFile)
+		go ProcessLookup(numberChunks, &wg, &mutex, proxyChannel, apiKey, &carriers, &uncheckedNumFile, &totalChecks)
 	}
 
 	for i := 0; i < len(numberList); i += chunkSize {
