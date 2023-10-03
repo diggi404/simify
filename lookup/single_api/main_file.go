@@ -1,4 +1,4 @@
-package lookup
+package single_api
 
 import (
 	"bufio"
@@ -11,21 +11,10 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/ncruces/zenity"
+	"golang.org/x/net/proxy"
 )
 
-type BalanceInfo struct {
-	Balance         string `json:"balance"`
-	CreditLimit     string `json:"credit_limit"`
-	AvailableCredit string `json:"available_credit"`
-	Currency        string `json:"currency"`
-	RecordType      string `json:"record_type"`
-}
-
-type DataInfo struct {
-	Data BalanceInfo `json:"data"`
-}
-
-func HRLLOOKUP() {
+func SingleAPILookup() {
 	red := color.New(color.FgHiRed).PrintfFunc()
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Print("\nEnter your Telnyx API Key :> ")
@@ -34,6 +23,7 @@ func HRLLOOKUP() {
 		fmt.Printf("err: %v\n", err)
 		return
 	}
+	apiKey = strings.TrimRight(apiKey, "\r\n")
 	color.New(color.FgHiBlue).Println("\nChecking account balance...")
 
 	info, err := CheckBalance(apiKey)
@@ -51,7 +41,7 @@ func HRLLOOKUP() {
 	balance := int(balance64)
 	if balance <= 0 {
 		color.New(color.FgHiRed).Println("\nYour account has a low balance. Kinldy Topup to continue.")
-		return
+		// return
 	}
 	fmt.Print("\nPress Enter to select your numbers: ")
 	_, err = reader.ReadString('\n')
@@ -70,6 +60,10 @@ func HRLLOOKUP() {
 	numberList, err := fileutil.ReadFromFile(filePath)
 	if err != nil {
 		fmt.Printf("err: %v\n", err)
+		return
+	}
+	if len(numberList) == 0 {
+		color.New(color.FgHiRed).Println("\nEmpty File. Exiting...")
 		return
 	}
 	color.New(color.FgHiMagenta).Printf("\nTotal Numbers: %d\n", len(numberList))
@@ -113,6 +107,10 @@ func HRLLOOKUP() {
 		fmt.Printf("err: %v\n", err)
 		return
 	}
+	if len(proxyList) == 0 {
+		color.New(color.FgHiRed).Println("\nEmtpy File. Exiting...")
+		return
+	}
 	color.New(color.FgHiMagenta).Printf("\nTotal Proxies: %d\n", len(proxyList))
 
 	maxWorkers := 100
@@ -122,14 +120,17 @@ func HRLLOOKUP() {
 		chunkSize++
 	}
 	numberChunks := make(chan []string, chunkSize)
+	proxyChannel := make(chan proxy.Dialer, 1)
 	var wg sync.WaitGroup
 	var mutex sync.Mutex
+	carriers := make(map[string]*os.File)
+	uncheckedNumFile := make(map[string]*os.File)
 
 	proxies := ProxyParser(proxyList, proxyType)
 
 	for i := 0; i < maxWorkers; i++ {
 		wg.Add(1)
-		go ProcessLookup(numberChunks, &wg, &mutex, &proxies)
+		go ProcessLookup(numberChunks, &wg, &mutex, proxyChannel, apiKey, &carriers, &uncheckedNumFile)
 	}
 
 	for i := 0; i < len(numberList); i += chunkSize {
@@ -140,6 +141,14 @@ func HRLLOOKUP() {
 		numberChunks <- numberList[i:end]
 	}
 	close(numberChunks)
+
+	go func() {
+		for {
+			for _, proxy := range proxies {
+				proxyChannel <- proxy
+			}
+		}
+	}()
 	wg.Wait()
 	fmt.Println("\nall done.")
 }

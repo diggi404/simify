@@ -1,11 +1,10 @@
-package lookup
+package single_api
 
 import (
 	"encoding/json"
 	"errors"
 	"io"
 	"net/http"
-	"strings"
 )
 
 func CheckBalance(apiKey string) (DataInfo, error) {
@@ -14,7 +13,6 @@ func CheckBalance(apiKey string) (DataInfo, error) {
 	if err != nil {
 		return DataInfo{}, err
 	}
-	apiKey = strings.TrimRight(apiKey, "\r\n")
 	req.Header = http.Header{
 		"Authorization": {"Bearer " + apiKey},
 	}

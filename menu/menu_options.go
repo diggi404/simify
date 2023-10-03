@@ -2,7 +2,7 @@ package menu
 
 import (
 	"simify/bulkgen"
-	"simify/lookup"
+	"simify/lookup/single_api"
 )
 
 func MenuSelection(choice int) {
@@ -10,6 +10,6 @@ func MenuSelection(choice int) {
 	case 1:
 		bulkgen.GenNumbers()
 	case 2:
-		lookup.HRLLOOKUP()
+		single_api.SingleAPILookup()
 	}
 }
