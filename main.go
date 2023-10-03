@@ -25,10 +25,13 @@ func main() {
 	`
 	menu.SlowPrintArt(art, time.Millisecond*50)
 	menuOptions := `
-		1. Bulk Number Generator		2. HRL Lookup using Telnyx API
+		1. Bulk Number Generator				2. HRL Lookup Using Single Telnyx API
 
 
-		3. Bulk SMS Sender			4. Exit
+		3. HRL Lookup Using Bulk Telnyx APIs			4. GMAIL SMTPs To SMS
+
+
+		5. OTHER SMTPs To SMS					5. Exit
 
 		
 	`

@@ -8,10 +8,43 @@ import (
 	"golang.org/x/net/proxy"
 )
 
+type Portability struct {
+	LRN                string `json:"lrn"`
+	PortedStatus       string `json:"ported_status"`
+	PortedDate         string `json:"ported_date"`
+	OCN                string `json:"ocn"`
+	LineType           string `json:"line_type"`
+	SPID               string `json:"spid"`
+	SPIDCarrierName    string `json:"spid_carrier_name"`
+	SPIDCarrierType    string `json:"spid_carrier_type"`
+	AltSPID            string `json:"altspid"`
+	AltSPIDCarrierName string `json:"altspid_carrier_name"`
+	AltSPIDCarrierType string `json:"altspid_carrier_type"`
+	City               string `json:"city"`
+	State              string `json:"state"`
+}
+
+type Data struct {
+	CountryCode    string      `json:"country_code"`
+	NationalFormat string      `json:"national_format"`
+	PhoneNumber    string      `json:"phone_number"`
+	Fraud          interface{} `json:"fraud"`
+	Carrier        interface{} `json:"carrier"`
+	CallerName     interface{} `json:"caller_name"`
+	NNIDOverride   interface{} `json:"nnid_override"`
+	Portability    Portability `json:"portability"`
+	ValidNumber    bool        `json:"valid_number"`
+	RecordType     string      `json:"record_type"`
+}
+
+type PhoneNumberInfo struct {
+	Data Data `json:"data"`
+}
+
 func LookupAPI(proxy proxy.Dialer, number string) error {
 	httpClient := &http.Client{Transport: &http.Transport{Dial: proxy.Dial}}
-	lookupURL := fmt.Sprintf("https://api.telnyx.com/v2/number_lookup/%s", number)
-	req, err := http.NewRequest("GET", lookupURL, nil)
+	// lookupURL := fmt.Sprintf("https://api.telnyx.com/v2/number_lookup/%s", number)
+	req, err := http.NewRequest("GET", "https://api.telnyx.com/v2/account", nil)
 	if err != nil {
 		fmt.Printf("err: %v\n", err)
 		return err

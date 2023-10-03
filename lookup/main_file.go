@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"simify/fileutil"
+	"strconv"
 	"strings"
 	"sync"
 
@@ -12,10 +13,48 @@ import (
 	"github.com/ncruces/zenity"
 )
 
+type BalanceInfo struct {
+	Balance         string `json:"balance"`
+	CreditLimit     string `json:"credit_limit"`
+	AvailableCredit string `json:"available_credit"`
+	Currency        string `json:"currency"`
+	RecordType      string `json:"record_type"`
+}
+
+type DataInfo struct {
+	Data BalanceInfo `json:"data"`
+}
+
 func HRLLOOKUP() {
+	red := color.New(color.FgHiRed).PrintfFunc()
 	reader := bufio.NewReader(os.Stdin)
+	fmt.Print("\nEnter your Telnyx API Key :> ")
+	apiKey, err := reader.ReadString('\n')
+	if err != nil {
+		fmt.Printf("err: %v\n", err)
+		return
+	}
+	color.New(color.FgHiBlue).Println("\nChecking account balance...")
+
+	info, err := CheckBalance(apiKey)
+	if err != nil {
+		red("\nerr: %v\n", err)
+		return
+	}
+	balanceInfoStr := fmt.Sprintf("\nAccount Balance: %s %s", info.Data.Currency, info.Data.Balance)
+	color.New(color.FgHiMagenta).Println(balanceInfoStr)
+	balance64, err := strconv.ParseFloat(info.Data.Balance, 64)
+	if err != nil {
+		fmt.Printf("err: %v\n", err)
+		return
+	}
+	balance := int(balance64)
+	if balance <= 0 {
+		color.New(color.FgHiRed).Println("\nYour account has a low balance. Kinldy Topup to continue.")
+		return
+	}
 	fmt.Print("\nPress Enter to select your numbers: ")
-	_, err := reader.ReadString('\n')
+	_, err = reader.ReadString('\n')
 	if err != nil {
 		fmt.Printf("err: %v\n", err)
 		return
