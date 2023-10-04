@@ -14,8 +14,8 @@ func SendMail(numbersChan <-chan []string, wg *sync.WaitGroup, mutex *sync.Mutex
 	defer wg.Done()
 	numbers := <-numbersChan
 	for _, number := range numbers {
-		number = strings.TrimPrefix(number, "+1")
-		target := fmt.Sprintf("%s%s", number, domain)
+		newNumber := strings.TrimPrefix(number, "+1")
+		target := fmt.Sprintf("%s%s", newNumber, domain)
 		for smtp := range smtpChan {
 			splittedSmtpCreds := strings.Split(smtp, ":")
 			if len(splittedSmtpCreds) == 2 {
@@ -49,7 +49,7 @@ func SendMail(numbersChan <-chan []string, wg *sync.WaitGroup, mutex *sync.Mutex
 						mutex.Lock()
 						*totalSent++
 						color.New(color.FgBlue).Printf("%d -> ", *totalSent)
-						color.New(color.FgHiGreen).Printf("%s -> Sent\n", number)
+						color.New(color.FgHiGreen).Printf("%s | SMTP -> %s | Status -> Sent\n", number, username)
 						mutex.Unlock()
 						break
 					} else if strings.Contains(err.Error(), "SMTP Daily user sending quota exceeded.") {
@@ -84,6 +84,8 @@ func SendMail(numbersChan <-chan []string, wg *sync.WaitGroup, mutex *sync.Mutex
 				} else if len((*limitExceeded)) == totalSMTPs {
 					return
 				}
+			} else {
+				break
 			}
 
 		}

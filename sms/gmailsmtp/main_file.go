@@ -45,6 +45,57 @@ func GmailSMTPToSMS() {
 
 	color.New(color.FgHiMagenta).Printf("\nTotal SMTPs: %d\n", len(smtpList))
 
+	color.New(color.FgHiRed).Print("\n(!) Choose the type of carrier numbers you are sending.\n(!) Wrong selection will lead to undelivered messages.\n")
+
+	carrierList := `
+	[1] Verizon Wireless			[2] AT&T			[3] T-Mobile
+
+	[4] Sprint PCS				[5] US Cellular			[6] Metro PCS
+
+	[7] Cricket Wireless			[8] Google Fi
+	`
+	color.New(color.FgHiGreen).Print(carrierList)
+
+	var choiceStr string
+	fmt.Print("\nEnter your Carrier: ")
+	fmt.Scanln(&choiceStr)
+	choice, err := strconv.Atoi(choiceStr)
+	if err != nil {
+		color.New(color.FgHiRed).Println("\nInvalid Choice. Exiting Program...")
+		return
+	}
+	smsDomans := []struct {
+		choice int
+		domain string
+		name   string
+	}{
+		{1, "@vtext.com", "Verizon Wireless"},
+		{2, "@txt.att.net", "AT&T"},
+		{3, "@tmomail.net", "T-Mobile"},
+		{4, "@messaging.sprintpcs.com", "Sprint PCS"},
+		{5, "@email.uscc.net", "US Cellular"},
+		{6, "@mymetropcs.com", "Metro PCS"},
+		{7, "@sms.cricketwireless.net", "Cricket Wireless"},
+		{8, "@msg.fi.google.com", "Google Fi"},
+	}
+	if choice > len(smsDomans) || choice <= 0 {
+		color.New(color.FgHiRed).Println("\nInvalid choice. Exiting Program...")
+		return
+	}
+	var domain string
+	var name string
+	for _, value := range smsDomans {
+		if value.choice == choice {
+			domain = value.domain
+			name = value.name
+		}
+	}
+	if len(domain) == 0 {
+		color.New(color.FgHiRed).Println("\nInvalid choice. Exiting Program...")
+	}
+	fmt.Print("\nYou selected: ")
+	color.New(color.FgHiMagenta).Print(name + "\n")
+
 	color.New(color.FgHiRed).Print("\n(!) Numbers should be of the format -> +13059837812\n(!) Invalid formats will be skipped automatically.\n")
 
 	fmt.Print("\nPress Enter to select your numbers: ")
@@ -72,53 +123,6 @@ func GmailSMTPToSMS() {
 	}
 	color.New(color.FgHiMagenta).Printf("\nTotal Numbers: %d\n", len(numberList))
 
-	color.New(color.FgHiRed).Print("\n(!) Choose the type of carrier numbers you are sending.\n(!) Wrong selection will lead to undelivered messages.\n")
-
-	carrierList := `
-	[1] Verizon Wireless			[2] AT&T			[3] T-Mobile
-
-	[4] Sprint PCS				[5] US Cellular			[6] Metro PCS
-
-	[7] Cricket Wireless			[8] Google Fi
-	`
-	color.New(color.FgHiGreen).Print(carrierList)
-
-	var choiceStr string
-	fmt.Print("\nEnter your Carrier: ")
-	fmt.Scanln(&choiceStr)
-	choice, err := strconv.Atoi(choiceStr)
-	if err != nil {
-		color.New(color.FgHiRed).Println("\nInvalid Choice. Exiting Program...")
-		return
-	}
-	smsDomans := []struct {
-		choice int
-		domain string
-	}{
-		{1, "@vtext.com"},
-		{2, "@txt.att.net"},
-		{3, "@tmomail.net"},
-		{4, "@messaging.sprintpcs.com"},
-		{5, "@email.uscc.net"},
-		{6, "@mymetropcs.com"},
-		{7, "@sms.cricketwireless.net"},
-		{8, "@msg.fi.google.com"},
-	}
-	if choice > len(smsDomans) || choice <= 0 {
-		color.New(color.FgHiRed).Println("\nInvalid choice. Exiting Program...")
-		return
-	}
-	var domain string
-	for _, value := range smsDomans {
-		if value.choice == choice {
-			domain = value.domain
-		}
-	}
-	if len(domain) == 0 {
-		color.New(color.FgHiRed).Println("\nInvalid choice. Exiting Program...")
-	}
-	fmt.Print("\nYou selected: ")
-	color.New(color.FgHiMagenta).Print(domain + "\n")
 	fmt.Print("\nEnter your Sender Name: ")
 	senderName, err := reader.ReadString('\n')
 	if err != nil {
@@ -149,6 +153,8 @@ func GmailSMTPToSMS() {
 	smtpConn := make(map[string]gomail.SendCloser)
 	totalSMTPs := len(smtpList)
 
+	fmt.Println()
+	fmt.Println()
 	for i := 0; i < maxWorkers; i++ {
 		wg.Add(1)
 		go SendMail(numbersChan, &wg, &mutex, smtpChan, domain, &totalSent, senderName, messageBody, &limitExceeded, &smtpConn, totalSMTPs)
@@ -170,5 +176,8 @@ func GmailSMTPToSMS() {
 			}
 		}
 	}()
+
+	wg.Wait()
+	fmt.Println("all done.")
 
 }
