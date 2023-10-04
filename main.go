@@ -31,7 +31,7 @@ func main() {
 		3. HRL Lookup Using Bulk Telnyx APIs			4. GMAIL SMTPs To SMS
 
 
-		5. OTHER SMTPs To SMS					5. Exit
+		5. OTHER SMTPs To SMS					6. Exit
 
 		
 	`
