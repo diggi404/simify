@@ -30,10 +30,10 @@ func main() {
 		[1] Bulk Number Generator				[2] HRL Lookup Using Single Telnyx API
 
 
-		[3] HRL Lookup Using Bulk Telnyx APIs			[4] GMAIL SMTPs To SMS
+		[3] HRL Lookup Using Bulk Telnyx APIs			[4] GMAIL SMTPs To SMS (USA ONLY)
 
 
-		[5] OTHER SMTPs To SMS					[6] Exit
+		[5] OTHER SMTPs To SMS (USA ONLY)			[6] Exit
 
 		
 	`
