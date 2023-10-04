@@ -10,28 +10,30 @@ import (
 )
 
 func main() {
+	fmt.Print("\033[H\033[2J")
 	art := `
-				_____ ________  ________________   __
-				/  ___|_   _|  \/  |_   _|  ___\ \ / /
-				\ '--.  | | | .  . | | | | |_   \ V / 
-				 '--. \ | | | |\/| | | | |  _|   \ /  
-				/\__/ /_| |_| |  | |_| |_| |     | |  
-				\____/ \___/\_|  |_/\___/\_|     \_/  V1.0
+	
+					░██████╗██╗███╗░░░███╗██╗███████╗██╗██╗░░░██╗
+					██╔════╝██║████╗░████║██║██╔════╝██║╚██╗░██╔╝
+					╚█████╗░██║██╔████╔██║██║█████╗░░██║░╚████╔╝░
+					░╚═══██╗██║██║╚██╔╝██║██║██╔══╝░░██║░░╚██╔╝░░
+					██████╔╝██║██║░╚═╝░██║██║██║░░░░░██║░░░██║░░░
+					╚═════╝░╚═╝╚═╝░░░░░╚═╝╚═╝╚═╝░░░░░╚═╝░░░╚═╝░░░
 
 
-				 [x] Created By @hidden404_bot [x]
+					     [x] Created By @hidden404_bot [x]
 				 
 				 
 	`
 	menu.SlowPrintArt(art, time.Millisecond*50)
 	menuOptions := `
-		1. Bulk Number Generator				2. HRL Lookup Using Single Telnyx API
+		[1] Bulk Number Generator				[2] HRL Lookup Using Single Telnyx API
 
 
-		3. HRL Lookup Using Bulk Telnyx APIs			4. GMAIL SMTPs To SMS
+		[3] HRL Lookup Using Bulk Telnyx APIs			[4] GMAIL SMTPs To SMS
 
 
-		5. OTHER SMTPs To SMS					6. Exit
+		[5] OTHER SMTPs To SMS					[6] Exit
 
 		
 	`
