@@ -61,12 +61,12 @@ func SendMail(numbersChan <-chan []string, wg *sync.WaitGroup, mutex *sync.Mutex
 						mutex.Lock()
 						(*limitExceeded)[smtp] = true
 						files[2].WriteString(smtp + "\n")
-						color.New(color.FgHiRed).Printf("%s -> Daily Sending Limit exceeded!", smtp)
+						// color.New(color.FgHiRed).Printf("%s -> Daily Sending Limit exceeded!", smtp)
 						mutex.Unlock()
 						continue
 					} else {
 						mutex.Lock()
-						color.New(color.FgHiRed).Printf("\nSMTP rate limited. Retrying in 3 mins...\n")
+						// color.New(color.FgHiRed).Printf("\nSMTP rate limited. Retrying in 3 mins...\n")
 						duration := 3 * time.Minute
 						startTime := time.Now()
 						for {
@@ -75,9 +75,9 @@ func SendMail(numbersChan <-chan []string, wg *sync.WaitGroup, mutex *sync.Mutex
 							if remainingTime <= 0 {
 								break
 							}
-							color.New(color.FgHiMagenta).Printf("\rTime Remaining: %02d:%02d",
-								int(remainingTime.Minutes()),
-								int(remainingTime.Seconds())%60)
+							// color.New(color.FgHiMagenta).Printf("\rTime Remaining: %02d:%02d",
+							// 	int(remainingTime.Minutes()),
+							// 	int(remainingTime.Seconds())%60)
 							time.Sleep(time.Second)
 						}
 						newConn, err := CreateSMTPConn(username, password)

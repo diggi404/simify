@@ -195,6 +195,6 @@ func GmailSMTPToSMS() {
 	}()
 
 	wg.Wait()
-	fmt.Println("all done.")
+	fmt.Println("\nHappy Spamming. Your sendout results have been saved to 'sms_results' folder.")
 
 }
