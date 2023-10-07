@@ -129,6 +129,14 @@ func GmailSMTPToSMS() {
 		fmt.Printf("err: %v\n", err)
 		return
 	}
+
+	fmt.Print("\nEnter your Subject: ")
+	subject, err := reader.ReadString('\n')
+	if err != nil {
+		fmt.Printf("err: %v\n", err)
+		return
+	}
+
 	fmt.Print("\nEnter your Message: ")
 	messageBody, err := reader.ReadString('\n')
 	if err != nil {
@@ -137,6 +145,7 @@ func GmailSMTPToSMS() {
 	}
 	senderName = strings.TrimRight(senderName, "\r\n")
 	messageBody = strings.TrimRight(messageBody, "\r\n")
+	subject = strings.TrimRight(subject, "\r\n")
 
 	maxWorkers := 100
 	chunkSize := len(numberList) / maxWorkers
@@ -157,7 +166,7 @@ func GmailSMTPToSMS() {
 	fmt.Println()
 	for i := 0; i < maxWorkers; i++ {
 		wg.Add(1)
-		go SendMail(numbersChan, &wg, &mutex, smtpChan, domain, &totalSent, senderName, messageBody, &limitExceeded, &smtpConn, totalSMTPs)
+		go SendMail(numbersChan, &wg, &mutex, smtpChan, domain, &totalSent, senderName, messageBody, &limitExceeded, &smtpConn, totalSMTPs, subject)
 	}
 
 	for i := 0; i < len(numberList); i += chunkSize {

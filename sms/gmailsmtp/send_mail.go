@@ -10,7 +10,7 @@ import (
 	"gopkg.in/gomail.v2"
 )
 
-func SendMail(numbersChan <-chan []string, wg *sync.WaitGroup, mutex *sync.Mutex, smtpChan <-chan string, domain string, totalSent *int, senderName string, messageBody string, limitExceeded *map[string]bool, smtpConn *map[string]gomail.SendCloser, totalSMTPs int) {
+func SendMail(numbersChan <-chan []string, wg *sync.WaitGroup, mutex *sync.Mutex, smtpChan <-chan string, domain string, totalSent *int, senderName string, messageBody string, limitExceeded *map[string]bool, smtpConn *map[string]gomail.SendCloser, totalSMTPs int, subject string) {
 	defer wg.Done()
 	numbers := <-numbersChan
 	for _, number := range numbers {
@@ -37,7 +37,7 @@ func SendMail(numbersChan <-chan []string, wg *sync.WaitGroup, mutex *sync.Mutex
 					msg := gomail.NewMessage()
 					msg.SetAddressHeader("From", username, senderName)
 					msg.SetHeader("To", target)
-					msg.SetHeader("Subject", "From "+senderName)
+					msg.SetHeader("Subject", subject)
 					msg.SetBody("text/plain", messageBody)
 					mutex.Lock()
 					if conn != nil {
