@@ -2,6 +2,7 @@ package gmailsmtp
 
 import (
 	"fmt"
+	"os"
 	"strings"
 	"sync"
 	"time"
@@ -10,7 +11,7 @@ import (
 	"gopkg.in/gomail.v2"
 )
 
-func SendMail(numbersChan <-chan []string, wg *sync.WaitGroup, mutex *sync.Mutex, smtpChan <-chan string, domain string, totalSent *int, senderName string, messageBody string, limitExceeded *map[string]bool, smtpConn *map[string]gomail.SendCloser, totalSMTPs int, subject string) {
+func SendMail(numbersChan <-chan []string, wg *sync.WaitGroup, mutex *sync.Mutex, smtpChan <-chan string, domain string, totalSent *int, senderName string, messageBody string, limitExceeded *map[string]bool, invalidSMTPs *map[string]bool, smtpConn *map[string]gomail.SendCloser, totalSMTPs int, subject string, files []*os.File) {
 	defer wg.Done()
 	numbers := <-numbersChan
 	for _, number := range numbers {
@@ -29,7 +30,10 @@ func SendMail(numbersChan <-chan []string, wg *sync.WaitGroup, mutex *sync.Mutex
 							conn = conn1
 						} else {
 							mutex.Lock()
-							(*limitExceeded)[smtp] = true
+							if _, exists := (*invalidSMTPs)[smtp]; !exists {
+								(*invalidSMTPs)[smtp] = true
+								files[3].WriteString(smtp + "\n")
+							}
 							mutex.Unlock()
 							continue
 						}
@@ -50,11 +54,13 @@ func SendMail(numbersChan <-chan []string, wg *sync.WaitGroup, mutex *sync.Mutex
 						*totalSent++
 						color.New(color.FgBlue).Printf("%d -> ", *totalSent)
 						color.New(color.FgHiGreen).Printf("%s | SMTP -> %s | Status -> Sent\n", number, username)
+						files[0].WriteString(number + "\n")
 						mutex.Unlock()
 						break
 					} else if strings.Contains(err.Error(), "SMTP Daily user sending quota exceeded.") {
 						mutex.Lock()
 						(*limitExceeded)[smtp] = true
+						files[2].WriteString(smtp + "\n")
 						color.New(color.FgHiRed).Printf("%s -> Daily Sending Limit exceeded!", smtp)
 						mutex.Unlock()
 						continue
@@ -83,6 +89,10 @@ func SendMail(numbersChan <-chan []string, wg *sync.WaitGroup, mutex *sync.Mutex
 
 				} else if len((*limitExceeded)) == totalSMTPs {
 					return
+				} else {
+					mutex.Lock()
+					files[1].WriteString(number + "\n")
+					mutex.Unlock()
 				}
 			} else {
 				break

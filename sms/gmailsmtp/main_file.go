@@ -159,14 +159,22 @@ func GmailSMTPToSMS() {
 	numbersChan := make(chan []string, chunkSize)
 	smtpChan := make(chan string, 1)
 	limitExceeded := make(map[string]bool)
+	invalidSMTPs := make(map[string]bool)
 	smtpConn := make(map[string]gomail.SendCloser)
 	totalSMTPs := len(smtpList)
 
 	fmt.Println()
 	fmt.Println()
+
+	fileNames := []string{"sent", "not_sent", "rate_limited_smtps", "invalid_smtps"}
+	files := make([]*os.File, 3)
+	for _, name := range fileNames {
+		file, _ := fileutil.WriteToFile("sms_results", name)
+		files = append(files, file)
+	}
 	for i := 0; i < maxWorkers; i++ {
 		wg.Add(1)
-		go SendMail(numbersChan, &wg, &mutex, smtpChan, domain, &totalSent, senderName, messageBody, &limitExceeded, &smtpConn, totalSMTPs, subject)
+		go SendMail(numbersChan, &wg, &mutex, smtpChan, domain, &totalSent, senderName, messageBody, &limitExceeded, &invalidSMTPs, &smtpConn, totalSMTPs, subject, files)
 	}
 
 	for i := 0; i < len(numberList); i += chunkSize {
