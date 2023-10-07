@@ -94,8 +94,6 @@ func SendMail(numbersChan <-chan []string, wg *sync.WaitGroup, mutex *sync.Mutex
 					files[1].WriteString(number + "\n")
 					mutex.Unlock()
 				}
-			} else {
-				break
 			}
 
 		}
