@@ -13,7 +13,7 @@ import (
 func SendMail(numbersChan <-chan []string, wg *sync.WaitGroup, mutex *sync.Mutex, smtpChan <-chan string, domain string, totalSent *int, senderName string, messageBody string, limitExceeded *map[string]bool, invalidSMTPs *map[string]bool, invalidSMTPformat *map[string]bool, smtpConn *map[string]gomail.SendCloser, totalSMTPs int, subject string, files []*os.File) {
 	defer wg.Done()
 	numbers := <-numbersChan
-	for main_index, number := range numbers {
+	for mainIndex, number := range numbers {
 		newNumber := strings.TrimPrefix(number, "+1")
 		target := fmt.Sprintf("%s%s", newNumber, domain)
 		for smtp := range smtpChan {
@@ -74,9 +74,9 @@ func SendMail(numbersChan <-chan []string, wg *sync.WaitGroup, mutex *sync.Mutex
 					mutex.Unlock()
 					continue
 				}
-			} else if len((*invalidSMTPformat)) == totalSMTPs || len((*limitExceeded)) == totalSMTPs || len((*invalidSMTPs)) == totalSMTPs {
+			} else if len(*invalidSMTPformat) == totalSMTPs || len(*limitExceeded) == totalSMTPs || len(*invalidSMTPs) == totalSMTPs {
 				mutex.Lock()
-				for i := main_index; i < len(numbers); i++ {
+				for i := mainIndex; i < len(numbers); i++ {
 					num := numbers[i]
 					files[1].WriteString(num + "\n")
 				}

@@ -24,7 +24,7 @@ func SingleAPILookup() {
 		return
 	}
 	apiKey = strings.TrimRight(apiKey, "\r\n")
-	color.New(color.FgHiBlue).Println("\nChecking account balance...")
+	color.New(color.FgBlue).Println("\nChecking account balance...")
 
 	info, err := CheckBalance(apiKey)
 	if err != nil {
@@ -41,7 +41,7 @@ func SingleAPILookup() {
 	balance := int(balance64)
 	if balance <= 0 {
 		color.New(color.FgHiRed).Println("\nYour account has a low balance. Kinldy Topup to continue.")
-		// return
+		return
 	}
 	fmt.Print("\nPress Enter to select your numbers: ")
 	_, err = reader.ReadString('\n')
