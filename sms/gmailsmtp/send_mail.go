@@ -11,17 +11,17 @@ import (
 	"gopkg.in/gomail.v2"
 )
 
-func SendMail(numbersChan <-chan []string, wg *sync.WaitGroup, mutex *sync.Mutex, smtpChan <-chan string, domain string, totalSent *int, senderName string, messageBody string, limitExceeded *map[string]bool, invalidSMTPs *map[string]bool, smtpConn *map[string]gomail.SendCloser, totalSMTPs int, subject string, files []*os.File) {
+func SendMail(numbersChan <-chan []string, wg *sync.WaitGroup, mutex *sync.Mutex, smtpChan <-chan string, domain string, totalSent *int, senderName string, messageBody string, limitExceeded *map[string]bool, invalidSMTPs *map[string]bool, invalidSMTPFormat *map[string]bool, smtpConn *map[string]gomail.SendCloser, totalSMTPs int, subject string, files []*os.File) {
 	defer wg.Done()
 	numbers := <-numbersChan
-	for _, number := range numbers {
+	for main_index, number := range numbers {
 		newNumber := strings.TrimPrefix(number, "+1")
 		target := fmt.Sprintf("%s%s", newNumber, domain)
 		for smtp := range smtpChan {
-			splittedSmtpCreds := strings.Split(smtp, ":")
-			if len(splittedSmtpCreds) == 2 {
-				username, password := splittedSmtpCreds[0], splittedSmtpCreds[1]
-				if _, exits := (*limitExceeded)[smtp]; !exits {
+			if !(*invalidSMTPFormat)[smtp] && !(*limitExceeded)[smtp] && !(*invalidSMTPs)[smtp] {
+				splittedSmtpCreds, err := FilterCreds(smtp)
+				if err == nil {
+					username, password := splittedSmtpCreds[0], splittedSmtpCreds[1]
 					var conn gomail.SendCloser
 					if _, exists := (*smtpConn)[smtp]; !exists {
 						dialer := gomail.NewDialer("smtp.gmail.com", 587, username, password)
@@ -59,14 +59,14 @@ func SendMail(numbersChan <-chan []string, wg *sync.WaitGroup, mutex *sync.Mutex
 						break
 					} else if strings.Contains(err.Error(), "SMTP Daily user sending quota exceeded.") {
 						mutex.Lock()
-						(*limitExceeded)[smtp] = true
-						files[2].WriteString(smtp + "\n")
-						// color.New(color.FgHiRed).Printf("%s -> Daily Sending Limit exceeded!", smtp)
+						if _, exists := (*limitExceeded)[smtp]; !exists {
+							(*limitExceeded)[smtp] = true
+							files[2].WriteString(smtp + "\n")
+						}
 						mutex.Unlock()
 						continue
 					} else {
 						mutex.Lock()
-						// color.New(color.FgHiRed).Printf("\nSMTP rate limited. Retrying in 3 mins...\n")
 						duration := 3 * time.Minute
 						startTime := time.Now()
 						for {
@@ -85,15 +85,25 @@ func SendMail(numbersChan <-chan []string, wg *sync.WaitGroup, mutex *sync.Mutex
 							(*smtpConn)[smtp] = newConn
 						}
 						mutex.Unlock()
+						continue
 					}
-
-				} else if len((*limitExceeded)) == totalSMTPs {
-					return
 				} else {
 					mutex.Lock()
-					files[1].WriteString(number + "\n")
+					if _, exists := (*invalidSMTPFormat)[smtp]; !exists {
+						(*invalidSMTPFormat)[smtp] = true
+						files[4].WriteString(smtp + "\n")
+					}
 					mutex.Unlock()
+					continue
 				}
+			} else if len((*invalidSMTPFormat)) == totalSMTPs || len((*limitExceeded)) == totalSMTPs || len((*invalidSMTPs)) == totalSMTPs {
+				mutex.Lock()
+				for i := main_index; i < len(numbers); i++ {
+					num := numbers[i]
+					files[1].WriteString(num + "\n")
+				}
+				mutex.Unlock()
+				return
 			}
 
 		}

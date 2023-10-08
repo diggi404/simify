@@ -10,14 +10,14 @@ import (
 func SlowPrintArt(text string, delay time.Duration) {
 	lines := strings.Split(text, "\n")
 	for _, line := range lines {
-		color.New(color.FgHiCyan).Println(line)
+		color.New(color.FgHiRed).Println(line)
 		time.Sleep(delay)
 	}
 }
 func SlowPrintMenu(text string, delay time.Duration) {
 	lines := strings.Split(text, "\n")
 	for _, line := range lines {
-		color.New(color.FgHiBlue).Println(line)
+		color.New(color.FgHiGreen).Println(line)
 		time.Sleep(delay)
 	}
 }
