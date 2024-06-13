@@ -18,8 +18,10 @@ func GmailSMTPToSMS() {
 	color.New(color.FgHiRed).Print("\n(!) SMTPs should be of the format -> example@gmail.com:password\n(!) Invalid formats will be skipped automatically.\n")
 
 	reader := bufio.NewReader(os.Stdin)
-
-	fmt.Print("\nPress Enter to select your SMTPs: ")
+	color.New(color.FgHiRed).Print("\n(")
+	color.New(color.FgHiGreen).Print(">")
+	color.New(color.FgHiRed).Print(")")
+	fmt.Print(" Press Enter to select your SMTPs: ")
 	_, err := reader.ReadString('\n')
 	if err != nil {
 		fmt.Printf("err: %v\n", err)
@@ -57,7 +59,10 @@ func GmailSMTPToSMS() {
 	color.New(color.FgHiGreen).Print(carrierList)
 
 	var choiceStr string
-	fmt.Print("\nEnter your Carrier: ")
+	color.New(color.FgHiRed).Print("\n(")
+	color.New(color.FgHiGreen).Print(">")
+	color.New(color.FgHiRed).Print(")")
+	fmt.Print(" Enter your Carrier :> ")
 	fmt.Scanln(&choiceStr)
 	choice, err := strconv.Atoi(choiceStr)
 	if err != nil {
@@ -98,7 +103,10 @@ func GmailSMTPToSMS() {
 
 	color.New(color.FgHiRed).Print("\n(!) Numbers should be of the format -> +13059837812\n(!) Invalid formats will be skipped automatically.\n")
 
-	fmt.Print("\nPress Enter to select your numbers: ")
+	color.New(color.FgHiRed).Print("\n(")
+	color.New(color.FgHiGreen).Print(">")
+	color.New(color.FgHiRed).Print(")")
+	fmt.Print(" Press Enter to select your numbers: ")
 	_, err = reader.ReadString('\n')
 	if err != nil {
 		fmt.Printf("err: %v\n", err)
@@ -123,21 +131,30 @@ func GmailSMTPToSMS() {
 	}
 	color.New(color.FgHiMagenta).Printf("\nTotal Numbers: %d\n", len(numberList))
 
-	fmt.Print("\nEnter your Sender Name: ")
+	color.New(color.FgHiRed).Print("\n(")
+	color.New(color.FgHiGreen).Print(">")
+	color.New(color.FgHiRed).Print(")")
+	fmt.Print(" Enter your Sender Name :> ")
 	senderName, err := reader.ReadString('\n')
 	if err != nil {
 		fmt.Printf("err: %v\n", err)
 		return
 	}
 
-	fmt.Print("\nEnter your Subject: ")
+	color.New(color.FgHiRed).Print("\n(")
+	color.New(color.FgHiGreen).Print(">")
+	color.New(color.FgHiRed).Print(")")
+	fmt.Print(" Enter your Subject :> ")
 	subject, err := reader.ReadString('\n')
 	if err != nil {
 		fmt.Printf("err: %v\n", err)
 		return
 	}
 
-	fmt.Print("\nEnter your Message: ")
+	color.New(color.FgHiRed).Print("\n(")
+	color.New(color.FgHiGreen).Print(">")
+	color.New(color.FgHiRed).Print(")")
+	fmt.Print(" Enter your Message :> ")
 	messageBody, err := reader.ReadString('\n')
 	if err != nil {
 		fmt.Printf("err: %v\n", err)

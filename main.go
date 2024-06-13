@@ -27,19 +27,19 @@ func main() {
 	`
 	menu.SlowPrintArt(art, time.Millisecond*50)
 	menuOptions := `
-		[1] Bulk Number Generator				[2] HRL Lookup Using Single Telnyx API
+		[1] Bulk Number Generator				[2] HRL Lookup Using Telnyx API Key
 
 
-		[3] HRL Lookup Using Bulk Telnyx APIs			[4] GMAIL SMTPs To SMS (USA ONLY)
-
-
-		[5] OTHER SMTPs To SMS (USA ONLY)			[6] Exit
+		[3] GMAIL SMTPs To SMS (USA ONLY)			[4] OTHER SMTPs To SMS (USA ONLY)
 
 		
 	`
 	menu.SlowPrintMenu(menuOptions, time.Millisecond*50)
 	var choiceStr string
-	fmt.Print("Enter your option :> ")
+	color.New(color.FgHiRed).Print("(")
+	color.New(color.FgHiGreen).Print("~")
+	color.New(color.FgHiRed).Print(")")
+	fmt.Print(" Enter your option :> ")
 	fmt.Scanln(&choiceStr)
 	choice, err := strconv.Atoi(choiceStr)
 	if err != nil {
