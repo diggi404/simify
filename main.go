@@ -21,7 +21,7 @@ func main() {
 					╚═════╝░╚═╝╚═╝░░░░░╚═╝╚═╝╚═╝░░░░░░░░╚═╝░░░
 
 
-					     [x] Created By @hidden404_bot [x]
+					     [x] Created By @yeptg [x]
 				 
 				 
 	`
